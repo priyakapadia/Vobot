@@ -1,0 +1,12 @@
+# Generated files
+bin/
+gen/
+out/
+
+# Gradle files
+.gradle/
+build/
+
+# Android studio files
+.iml 
+.idea
