@@ -3,6 +3,7 @@ package com.wowwee.mipsample;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.view.View;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
+
 
 
 /**
@@ -38,6 +40,34 @@ public class RecordWordsActivity extends Activity {
         SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy");
         String dateString = sdf.format(date);
         tv.setText(dateString);
+
+
+        Button mother_button = (Button) this.findViewById(R.id.play_mother);
+        Button table_button = (Button) this.findViewById(R.id.play_table);
+
+        final MediaPlayer mp_mother = MediaPlayer.create(this, R.raw.mother);
+        final MediaPlayer mp_table = MediaPlayer.create(this, R.raw.table);
+
+
+        mother_button.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                //Intent i= new Intent(CurrentActivity.this, UpcomingActivity.class);
+                mp_mother.start();
+               // playSound();
+            }
+
+        });
+
+        table_button.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                //Intent i= new Intent(CurrentActivity.this, UpcomingActivity.class);
+                mp_table.start();
+                //playSound();
+            }
+
+        });
 
 
         voiceToText = (TextView) findViewById(R.id.voiceIn);
@@ -74,7 +104,10 @@ public class RecordWordsActivity extends Activity {
                 if (resultCode == RESULT_OK && null != data) {
                     ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
                     voiceToText.setText(result.get(0));
-                    playSound();
+
+                    if (result.get(0)=="mother") {
+                        playSound();
+                    }
                 }
                 break;
             }

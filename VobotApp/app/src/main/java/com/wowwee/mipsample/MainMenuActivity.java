@@ -3,11 +3,14 @@ package com.wowwee.mipsample;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
+import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
+import android.speech.RecognizerIntent;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -28,12 +31,15 @@ import com.wowwee.bluetoothrobotcontrollib.sdk.MipRobotFinder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 
 public class MainMenuActivity extends FragmentActivity implements MipRobotInterface{
 
 	private BluetoothAdapter mBluetoothAdapter;
     private Spinner spinner1;
+	private TextView voiceToText;
+	private static final int REQ_CODE_VOICE_IN = 143;
 	
 	@Override
 	protected void onCreate(Bundle arg0) {
@@ -51,6 +57,91 @@ public class MainMenuActivity extends FragmentActivity implements MipRobotInterf
 		finder.setApplicationContext(getApplicationContext());
 		toggleConnectButton();
 		addListenerOnSpinnerItemSelection();
+
+
+		voiceToText = (TextView) findViewById(R.id.voiceIn);
+		Button speakPromt = (Button) findViewById(R.id.btnToSpeak);
+		speakPromt.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				startVoiceToTextService();
+			}
+		});
+
+	//	Button mother_button = (Button) this.findViewById(R.id.play_mother);
+		//Button table_button = (Button) this.findViewById(R.id.play_table);
+
+//		final MediaPlayer mp_mother = MediaPlayer.create(this, R.raw.mother);
+//		//final MediaPlayer mp_table = MediaPlayer.create(this, R.raw.table);
+//
+//
+//		mother_button.setOnClickListener(new View.OnClickListener(){
+//			@Override
+//			public void onClick(View view) {
+//				//Intent i= new Intent(CurrentActivity.this, UpcomingActivity.class);
+//				mp_mother.start();
+//				//playSound();
+//			}
+//
+//		});
+
+//		table_button.setOnClickListener(new View.OnClickListener(){
+//			@Override
+//			public void onClick(View view) {
+//				//Intent i= new Intent(CurrentActivity.this, UpcomingActivity.class);
+//				mp_table.start();
+//				playSound();
+//			}
+//
+//		});
+	}
+
+	private void startVoiceToTextService() {
+		Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+		//You can set here own local Language.
+		intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+		intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+		intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Hi, Talk to Me");
+
+		final MediaPlayer mp_mother = MediaPlayer.create(this, R.raw.mother);
+		mp_mother.start();
+		try {
+			Thread.sleep(3500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		try {
+			startActivityForResult(intent, REQ_CODE_VOICE_IN);
+		}
+		catch (ActivityNotFoundException a) {
+
+		}
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+
+		switch (requestCode) {
+			case REQ_CODE_VOICE_IN: {
+				if (resultCode == RESULT_OK && null != data) {
+					ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+					//ArrayList<String> result2 = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+					String word= result.get(0);
+					voiceToText.setText(word);
+					//spinner1 = (Spinner) findViewById(R.id.spinner1);
+					//System.out.println("**********************************************" + word);
+					if (word.compareTo("mother")==0 ) {
+						//playSound();
+						//performSelectedResponse();
+						performSelectedResponse(spinner1.getSelectedItemPosition());
+					}
+				}
+				break;
+			}
+
+		}
 	}
 	
 	@Override
@@ -141,13 +232,13 @@ public class MainMenuActivity extends FragmentActivity implements MipRobotInterf
 
             }
             break;
-            case R.id.get_started:
-            {
-                // Do we want Activity or Fragment?
-                Intent intentRecordWords = new Intent(MainMenuActivity.this, RecordWordsActivity.class);
-                MainMenuActivity.this.startActivity(intentRecordWords);
-            }
-            break;
+//            case R.id.get_started:
+//			{
+//				// Do we want Activity or Fragment?
+//				Intent intentRecordWords = new Intent(MainMenuActivity.this, RecordWordsActivity.class);
+//				MainMenuActivity.this.startActivity(intentRecordWords);
+//			}
+//			break;
             case R.id.drive:
                 DriveViewFragment fragment = new DriveViewFragment();
                 FragmentManager fragmentManager = getSupportFragmentManager();
