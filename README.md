@@ -1,27 +1,23 @@
-WowWee CHIP Android SDK
+Vobot
 ================================
 
 ![](Images/CHIP.png)
 
-The free CHIP Android SDK lets you control your [WowWee CHIP](http://wowwee.com/chip/) on devices running Android 4.3 and above with Bluetooth Low Energy chipsets. To use this SDK you will also need a physical CHIP robot.
-
-For information on WowWee products visit: <http://www.wowwee.com>
+Vobot is an Android App that controls a language therapy robot, the WowWee CHIP, to assist autistic child’s language acquisition. The app works on devices running Android 4.3 and above with Bluetooth Low Energy chipsets. To use this app, you will also need a physical CHIP robot. For language processing, Vobot uses an API called SpeechAce: speechace.com
 
 Table of Contents
 ---------------------------------------
 
 - [Quick Installation](#quick-installation)
-- [Notes about the SDK](#notes-about-the-sdk)
 - [License](#license)
-- [Contributing](#contributing)
-- [Projects using this SDK](#projects-using-this-sdk)
+- [Purchase CHIP](#purchase-chip)
 
 Quick Installation
 ---------------------------------
 
 1. Clone the repository or [download the zip](https://github.com/WowWeeLabs/CHIP-Android-SDK/archive/master.zip).
 
-		git clone https://github.com/WowWeeLabs/CHIP-Android-SDK.git
+		git clone https://github.com/priyakapadia/Vobot.git
 
 2. Open Android Studio and click "Open an existing Android Studio project".
 
@@ -35,40 +31,11 @@ Quick Installation
 
 	![](Images/android_studio_project_page.png)
 
-Notes about the SDK
----------------------------------
-
-### Simulator Support
-
-Our SDK cannot be used in the built in Android simulator due to lack of Bluetooth Low Energy support. Third party alternatives may work if they support the official BLE APIs.
-
-### Android Gear Support
-
-At present we havn't added support for Android gear. Third party support is welcome, please add an issue in the bug tracker.
-
-### Full Source Code
-
-At this stage we do not plan on releasing our full library source code.
-
-### Are there any restrictions on releasing my own application?
-
-The SDK is currently and will always be free for you to build and release your own applications. Your welcome to charge money or release free applications using our SDK without restrictions.
-
-If you create a great application, all we ask is that you provide a link for people to purchase their own CHIP so they can enjoy your product.
 
 License
 ---------------------------------
-CHIP Android SDK is available under the Apache License, Version 2.0 license. See the [LICENSE.txt](https://raw.githubusercontent.com/WowWeeLabs/CHIP-Android-SDK/master/LICENSE.md) file for more info.
+Vobot is available under the Apache License, Version 2.0 license. See the [LICENSE.txt](https://github.com/priyakapadia/Vobot/blob/master/LICENSE.md) file for more info.
 
-You are free to use our SDK in your own projects whether free or paid. There are no restrictions on releasing into Google Play or other stores. We do ask that you clearly differentiate your app from the official app so that users do not get confused.
-
-Contributing
+Purchase Chip
 ---------------------------------
-We happily accept any pull requests and monitor issues on GitHub regularly. Please feel free to give us your suggestions or enhancements. Please note that due to resource constraints we most likely cannot add new features to the CHIP robot itself, but we will certainly consider them for inclusion to future car/versions.
-
-Tell your friends, fork our project, buy our car and share with us your own projects! These are the best kinds of positive feedback to us.
-
-Projects using this SDK
----------------------------------
-* [WowWee CHIP Robotic Enhance Vehicles Official App](https://play.google.com/store/apps/details?id=com.wowwee.chip)
-* Send us a pull request to add your app here
+CHIP is available for purchase here: https://wowwee.com/chip
