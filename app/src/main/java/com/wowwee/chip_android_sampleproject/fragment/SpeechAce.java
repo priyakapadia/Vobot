@@ -14,6 +14,10 @@ import android.widget.TextView;
 
 import com.wowwee.chip_android_sampleproject.R;
 
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -26,6 +30,7 @@ import okhttp3.Response;
 
 
 public class SpeechAce extends Fragment {
+    private static String SPEECH_ACE_URL = "";
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -56,20 +61,16 @@ public class SpeechAce extends Fragment {
 
             @Override
             public void onClick(View v) {
-                sendToSpeechAce(v, httpResponseText);
+                getResponseFromSpeechAce(v, httpResponseText);
             }
         });
 
         return view;
     }
 
-    public void sendToSpeechAce2(View v, TextView httpResponseText){
+    public void getResponseFromSpeechAce(View v, TextView httpResponseText) {
 
-    }
-
-    public void sendToSpeechAce(View v, TextView httpResponseText){
-
-        final MediaPlayer mp_mother = MediaPlayer.create(getActivity(), R.raw.mother);
+        final MediaPlayer mp_mother = MediaPlayer.create(getActivity(), R.raw.prompt_apple);
         mp_mother.start();
         try {
             Thread.sleep(3500);
@@ -77,16 +78,27 @@ public class SpeechAce extends Fragment {
             e.printStackTrace();
         }
 
-        String responseText = "Error";
-
-        OkHttpClient client = new OkHttpClient();
         //String path = "/storage/emulated/0/Download/api-samples/api-samples/";
-        String path = Environment.getExternalStorageDirectory().getAbsolutePath()+ "/Download/api-samples/";
+        String path = Environment.getExternalStorageDirectory().getAbsolutePath()+ "/";
         Log.d("PATH", path);
-        File file = new File(path, "apple.wav");
-        //File file = new File(path, "shinsuke_nakamura.mp3");
+        File file = new File(path, "audiorecorded.mp4");
 
-        RequestBody requestFile = RequestBody.create(MediaType.parse("audio/x-wav"), file);
+        // Send Request with the audio file to SpeechAce
+        String responseText = sendRequestToSpeechAce(file);
+
+        //httpResponseText.setMovementMethod(new ScrollingMovementMethod());
+        httpResponseText.setText(responseText);
+
+        //Get quality score - returns -1 if errored out
+        if (!responseText.equals("Error")) {
+            double qualityScore = getQualityScore(responseText);
+            System.out.println("Quality Score: " + qualityScore);
+        }
+    }
+
+    private String sendRequestToSpeechAce(File file){
+        RequestBody requestFile = RequestBody.create(MediaType.parse("audio/mpeg3"), file);
+        //RequestBody requestFile = RequestBody.create(MediaType.parse("audio/x-wav"), file);
         MultipartBody.Part fileBody = MultipartBody.Part.createFormData("user_audio_file", "apple", requestFile);
         MultipartBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
                 .addPart(fileBody)
@@ -95,31 +107,38 @@ public class SpeechAce extends Fragment {
                 .build();
 
         Request request = new Request.Builder()
-                .url("https://api.speechace.co/api/scoring/text/v0.1/json?key=qkfwDzHl27%2BXibxYwaCF2Gt1KVktUtqrxGIRMfzcrDSaESeSkpcXidvleR4G5vvn%2BLoVLwmWbo%2BVlu4twd%2FfgLNiBp0RCEoQA0wYhf9pme3cU0Yopx6Bvm4yHpsrcNWY%0A%0A%20&dialect=en-us&user_id=001")
-                .post(body)
-                .build();
+                                     .url(SPEECH_ACE_URL)
+                                     .post(body)
+                                     .build();
+        try {
+            OkHttpClient client = new OkHttpClient();
+            Response response = client.newCall(request).execute();
 
-        Response response;
+            return response.body().string();
+        }
+        catch (IOException e) {
+
+            return "Error";
+        }
+    }
+
+    private double getQualityScore(String responseText) {
+
+        JSONObject jsonObject = null;
 
         try {
-            response = client.newCall(request).execute();
-           responseText = response.body().string();
-
-
-        } catch (IOException e) {
-            responseText= "Error";
+            Object jsonToObject = new JSONParser().parse(responseText);
+            jsonObject = (JSONObject) jsonToObject;
+        }
+        catch (ParseException e) {
+            System.err.println("Error while parsing Json, with message: " + e);
         }
 
-        //httpResponseText.setMovementMethod(new ScrollingMovementMethod());
-        httpResponseText.setText(responseText);
+        if(null != jsonObject) {
+            JSONObject jsonTextScore = (JSONObject) jsonObject.get("text_score");
+            return (double) jsonTextScore.get("quality_score");
+        }
 
-        //Get quality score
-//        if (!responseText.equals("Error")){
-//            JSONObject jsonObject = new JSONObject(responseText);
-//            JSONArray params = jsonObject.getJSONArray("text_score");
-//
-//            String ticket = params.getString("quality_score");
-//            Log.d("Score", ticket);
-//        }
+        return -1;
     }
 }
