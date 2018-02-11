@@ -9,6 +9,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.wowwee.bluetoothrobotcontrollib.chip.ChipRobot;
+import com.wowwee.bluetoothrobotcontrollib.chip.ChipRobotFinder;
 import com.wowwee.chip_android_sampleproject.R;
 import com.wowwee.chip_android_sampleproject.utils.FragmentHelper;
 
@@ -45,8 +47,8 @@ public class MenuFragment extends ChipBaseFragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position,
                                     long id) {
-               //if (ChipRobotFinder.getInstance().getChipRobotConnectedList().size() > 0) {
-                    //ChipRobot robot = (ChipRobot) ChipRobotFinder.getInstance().getChipRobotConnectedList().get(0);
+               if (ChipRobotFinder.getInstance().getChipRobotConnectedList().size() > 0) {
+                    ChipRobot robot = (ChipRobot) ChipRobotFinder.getInstance().getChipRobotConnectedList().get(0);
                     switch (position) {
                         case 0:
                             FragmentHelper.switchFragment(getActivity().getSupportFragmentManager(), new PlayingFragment(), R.id.view_id_content, false);
@@ -59,12 +61,12 @@ public class MenuFragment extends ChipBaseFragment {
                             FragmentHelper.switchFragment(getActivity().getSupportFragmentManager(), new SpeechAce(), R.id.view_id_content, false);
                             break;
                     }
-              // }
+               }
             }
         });
 
-//       ChipRobot robot = (ChipRobot) ChipRobotFinder.getInstance().getChipRobotConnectedList().get(0);
-     //   robot.setCallbackInterface(this);
+       ChipRobot robot = (ChipRobot) ChipRobotFinder.getInstance().getChipRobotConnectedList().get(0);
+        robot.setCallbackInterface(this);
 
         return view;
 

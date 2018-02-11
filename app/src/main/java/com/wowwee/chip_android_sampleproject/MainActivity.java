@@ -1,5 +1,6 @@
 package com.wowwee.chip_android_sampleproject;
 
+import android.bluetooth.BluetoothAdapter;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.WindowManager;
@@ -7,7 +8,7 @@ import android.view.WindowManager;
 import com.wowwee.bluetoothrobotcontrollib.BluetoothRobot;
 import com.wowwee.bluetoothrobotcontrollib.chip.ChipRobot;
 import com.wowwee.bluetoothrobotcontrollib.chip.ChipRobotFinder;
-import com.wowwee.chip_android_sampleproject.fragment.MenuFragment;
+import com.wowwee.chip_android_sampleproject.fragment.ConnectFragment;
 import com.wowwee.chip_android_sampleproject.utils.FragmentHelper;
 
 import java.util.List;
@@ -19,9 +20,9 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //BluetoothAdapter.getDefaultAdapter();
-        //FragmentHelper.switchFragment(getSupportFragmentManager(), new ConnectFragment(), R.id.view_id_content, false);
-        FragmentHelper.switchFragment(getSupportFragmentManager(), new MenuFragment(), R.id.view_id_content, false);
+        BluetoothAdapter.getDefaultAdapter();
+        FragmentHelper.switchFragment(getSupportFragmentManager(), new ConnectFragment(), R.id.view_id_content, false);
+        //FragmentHelper.switchFragment(getSupportFragmentManager(), new MenuFragment(), R.id.view_id_content, false);
     }
 
     @Override
