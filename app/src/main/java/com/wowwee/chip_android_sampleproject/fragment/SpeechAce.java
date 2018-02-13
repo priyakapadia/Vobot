@@ -18,12 +18,15 @@ import com.wowwee.bluetoothrobotcontrollib.chip.ChipRobot;
 import com.wowwee.bluetoothrobotcontrollib.chip.ChipRobotFinder;
 import com.wowwee.chip_android_sampleproject.R;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.LinkedHashMap;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -94,8 +97,8 @@ public class SpeechAce extends Fragment {
 
     public void getResponseFromSpeechAce(View v, TextView httpResponseText) {
 
-        final MediaPlayer mp_mother = MediaPlayer.create(getActivity(), R.raw.prompt_apple);
-        mp_mother.start();
+        final MediaPlayer prompt = MediaPlayer.create(getActivity(), R.raw.prompt_apple);
+        prompt.start();
         try {
             Thread.sleep(5000);
         } catch (InterruptedException e) {
@@ -103,7 +106,7 @@ public class SpeechAce extends Fragment {
         }
 
         //REWARD
-        rewardDog();
+      // rewardDog();
 
         Log.d("RECORD", "GOING TO START RECORDING");
 
@@ -126,34 +129,48 @@ public class SpeechAce extends Fragment {
         stopRecording();
         Log.d("RECORD", "RECORDING FINISHED");
 
-        //String path = "/storage/emulated/0/Download/api-samples/api-samples/";
+      // String path = "/storage/emulated/0/Download/api-samples/api-samples/";
         String path = Environment.getExternalStorageDirectory().getAbsolutePath()+ "/";
         Log.d("PATH", path);
-        File file = new File(path, "audiorecorded.mp4");
+        //File file = new File (path, "apple.wav");
+       File file = new File(path, "audiorecorded.mp4");
 
         // Send Request with the audio file to SpeechAce
         String responseText = sendRequestToSpeechAce(file);
 
         //Get quality score - returns -1 if errored out
         if (!responseText.equals("Error")) {
-            double qualityScore = getQualityScore(responseText);
-            System.out.println("Quality Score: " + qualityScore + "/100");
-            String outputText = "Total Score: "+  qualityScore + "/100";
+            // Get quality score for each syllable. Returns null if there was an error
+            final LinkedHashMap<String, Double> syllableToQualityScore = getQualityScore(responseText);
+            System.out.println("All Syllable to Q Score: " + syllableToQualityScore);
+
+            Collection<Double> cumulativeQScoreList = syllableToQualityScore.values();
+
+            Double cumulativeQualityScore = 0.0;
+            for(Double singleQualityScore: cumulativeQScoreList){
+                cumulativeQualityScore += singleQualityScore;
+            }
+            cumulativeQualityScore = cumulativeQualityScore/cumulativeQScoreList.size();
+
+            System.out.println("Quality Score: " + cumulativeQualityScore + "/100");
+            String outputText = "Total Score: "+  cumulativeQualityScore + "/100";
+            System.out.println(outputText);
             httpResponseText.setText(outputText);
-            if (qualityScore > 50){
+
+            if (cumulativeQualityScore > 50){
                 //reward-dog
                 rewardDog();
             }
             else {
-                outputText = "Total Score: "+ qualityScore + "/100. Please prompt the child again.";
+                outputText = "Total Score: "+ cumulativeQualityScore + "/100. Please prompt the child again.";
                 httpResponseText.setText(outputText);
             }
         }
     }
 
     private String sendRequestToSpeechAce(File file){
-        RequestBody requestFile = RequestBody.create(MediaType.parse("audio/mpeg3"), file);
-        //RequestBody requestFile = RequestBody.create(MediaType.parse("audio/x-wav"), file);
+        //RequestBody requestFile = RequestBody.create(MediaType.parse("audio/mpeg3"), file);
+        RequestBody requestFile = RequestBody.create(MediaType.parse("audio/x-wav"), file);
         MultipartBody.Part fileBody = MultipartBody.Part.createFormData("user_audio_file", "apple", requestFile);
         MultipartBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
                 .addPart(fileBody)
@@ -177,13 +194,15 @@ public class SpeechAce extends Fragment {
         }
     }
 
-    private double getQualityScore(String responseText) {
+    // Get quality score for each syllable. Returns null if there was an error
+    private LinkedHashMap<String, Double> getQualityScore(final String responseText) {
 
         JSONObject jsonObject = null;
 
         try {
             Object jsonToObject = new JSONParser().parse(responseText);
             jsonObject = (JSONObject) jsonToObject;
+
         }
         catch (ParseException e) {
             System.err.println("Error while parsing Json, with message: " + e);
@@ -191,10 +210,25 @@ public class SpeechAce extends Fragment {
 
         if(null != jsonObject) {
             JSONObject jsonTextScore = (JSONObject) jsonObject.get("text_score");
-            return (double) jsonTextScore.get("quality_score");
+            JSONArray jsonWordScore = (JSONArray) jsonTextScore.get("word_score_list");
+            return parseAllWords(jsonWordScore);
+        }
+        return null;
+    }
+
+    private LinkedHashMap<String, Double> parseAllWords(final JSONArray wordList){
+        LinkedHashMap<String, Double> syllableToQualityScore = new LinkedHashMap<>();
+        for (JSONObject wordJsonObject : (Iterable<JSONObject>) wordList) {
+            JSONArray syllableList = (JSONArray) wordJsonObject.get("syllable_score_list");
+
+            for (JSONObject syllableObject : (Iterable<JSONObject>) syllableList) {
+                String letters = (String) syllableObject.get("letters");
+                Double qualityScore = (Double) syllableObject.get("quality_score");
+                syllableToQualityScore.put(letters, qualityScore);
+            }
         }
 
-        return -1;
+        return syllableToQualityScore;
     }
 
     private void beginRecording() throws IOException {
@@ -232,4 +266,15 @@ public class SpeechAce extends Fragment {
     }
 
 }
+
+
+
+
+
+
+
+
+
+
+
 

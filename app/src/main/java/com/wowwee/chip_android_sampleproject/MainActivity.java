@@ -20,7 +20,7 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        BluetoothAdapter.getDefaultAdapter();
+       BluetoothAdapter.getDefaultAdapter();
         FragmentHelper.switchFragment(getSupportFragmentManager(), new ConnectFragment(), R.id.view_id_content, false);
         //FragmentHelper.switchFragment(getSupportFragmentManager(), new MenuFragment(), R.id.view_id_content, false);
     }
