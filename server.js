@@ -45,20 +45,17 @@ app.post('/sessions', function(req,res) {
 
 });
 
-// pushing child's word, overall similarity score, levels covered to words table (updating)
-
-
 // get information for feedback
 // selecting the specfic session and word from the sessions table for specific word
-// NEED TO DO!!!!! ADD SECOND PARAMETER FOR CHILDS WORD SO WE CAN MAKE INDIVIDUAL GRAPHS 
-app.get('/sessions/graph/:phone', function(req, res) {
+app.get('/sessions/graph/:phone&:word', function(req, res) {
     let phone_number = req.params.phone;
+    let childs_word = req.params.word;
 
-    if (!phone_number) {
+    if (!phone_number || !childs_word) {
         return res.status(400).send({error:true, message: 'Please enter valid parameters.'})
     }
 
-    con.query('SELECT session, indiv_score FROM sessions WHERE phone_number=?', [phone_number], function(error, results, fields) {
+    con.query('SELECT session, indiv_score FROM sessions WHERE phone_number=? AND childs_word=?', [phone_number, childs_word], function(error, results, fields) {
         if (error) throw error;
         return res.send({error: false, data: results, message: 'Information Taken'})
     });
