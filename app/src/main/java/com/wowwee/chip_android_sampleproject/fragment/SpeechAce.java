@@ -1,5 +1,7 @@
 package com.wowwee.chip_android_sampleproject.fragment;
 
+import android.content.Context;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Bundle;
@@ -17,7 +19,6 @@ import android.widget.Spinner;
 import android.widget.TableRow;
 import android.widget.TextView;
 
-import com.wowwee.bluetoothrobotcontrollib.chip.ChipCommandValues;
 import com.wowwee.bluetoothrobotcontrollib.chip.ChipRobot;
 import com.wowwee.bluetoothrobotcontrollib.chip.ChipRobotFinder;
 import com.wowwee.chip_android_sampleproject.R;
@@ -29,6 +30,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -44,7 +46,7 @@ import okhttp3.Response;
 public class SpeechAce extends Fragment {
 
     private static MediaRecorder recorder;
-
+    AudioManager audioManager;
     private Spinner spinner1;
     private TableRow table0, table1, table2, table3;
     private TextView syllable1_value, syllable2_value, syllable3_value, score1_value, score2_value, score3_value;
@@ -72,8 +74,8 @@ public class SpeechAce extends Fragment {
         }
         getActivity().getWindow().getDecorView().setSystemUiVisibility(flags);
 
-        View view = inflater.inflate(R.layout.fragment_speech_ace, container, false);
-
+        final View view = inflater.inflate(R.layout.fragment_speech_ace, container, false);
+        audioManager = (AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);
 
         addListenerOnSpinnerItemSelection(view); //call spinner function
 
@@ -97,12 +99,15 @@ public class SpeechAce extends Fragment {
         syllable3_value = (TextView) view.findViewById(R.id.syllable3);
         score3_value = (TextView) view.findViewById(R.id.score3);
 
+
+
         //setContentView(R.layout.fragment_speech_ace);
         final TextView httpResponseText = (TextView) view.findViewById(R.id.response);
         sendRequest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 getResponseFromSpeechAce(v, httpResponseText);
+               // playPrompt(prompt);
             }
         });
 
@@ -115,65 +120,72 @@ public class SpeechAce extends Fragment {
             }
         });
 
+
+
+
         return view;
     }
 
     public void rewardDog(){
         if (ChipRobotFinder.getInstance().getChipRobotConnectedList().size() > 0) {
             ChipRobot robot = (ChipRobot) ChipRobotFinder.getInstance().getChipRobotConnectedList().get(0);
-            ChipCommandValues.kChipSoundFileValue value = ChipCommandValues.kChipSoundFileValue.kChipSoundFile_None;
-            value.setValue(110);
-            robot.chipPlaySound(value);
+//            ChipCommandValues.kChipSoundFileValue value = ChipCommandValues.kChipSoundFileValue.kChipSoundFile_None;
+//            value.setValue(110);
+//            robot.chipPlaySound(value);
+
+            robot.chipPlayBodycon((byte)(5));
             try {
-                Thread.sleep(3500);
+                Thread.sleep(7000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            robot.chipStopSound();
+            robot.chipPlayBodycon((byte) (1));
         }
     }
 
-    public void getResponseFromSpeechAce(View v, TextView httpResponseText) {
 
+    public void playPrompt(){
 
-        //final MediaPlayer prompt;// = MediaPlayer.create(getActivity(), R.raw.prompt_apple);
+        OkHttpClient client = new OkHttpClient();
+        RequestBody requestBody = RequestBody.create(null, new byte[0]);
+        String getPromptString = "http://api.speechace.co/api/ttsing/text/v0.1/wav?key=qkfwDzHl27%2BXibxYwaCF2Gt1KVktUtqrxGIRMfzcrDSaESeSkpcXidvleR4G5vvn%2BLoVLwmWbo%2BVlu4twd%2FfgLNiBp0RCEoQA0wYhf9pme3cU0Yopx6Bvm4yHpsrcNWY&dialect=en-us&user_id=3332&text=" + String.valueOf(spinner1.getSelectedItem());
 
-        /*setting the correct audio file depending on the spinner value*/
-        if (String.valueOf(spinner1.getSelectedItem()).equals( "Apple")){
-            final MediaPlayer prompt = MediaPlayer.create(getActivity(), R.raw.prompt_apple);
-            prompt.start();
-        }
-        else if (String.valueOf(spinner1.getSelectedItem()).equals("Mother")){
-            final MediaPlayer prompt = MediaPlayer.create(getActivity(), R.raw.prompt_mother);
-            prompt.start();
-        }
-        else if (String.valueOf(spinner1.getSelectedItem()).equals("Table")){
-            final MediaPlayer prompt = MediaPlayer.create(getActivity(), R.raw.prompt_table);
-            prompt.start();
-        }
+         Request request = new Request.Builder()
+           .url(getPromptString)
+           .post(requestBody)
+           .build();
 
-        else if (String.valueOf(spinner1.getSelectedItem()).equals("Computer")){
-            final MediaPlayer prompt = MediaPlayer.create(getActivity(), R.raw.prompt_computer);
-            prompt.start();
-        }
-        else if (String.valueOf(spinner1.getSelectedItem()).equals("Asteroid")){
-            final MediaPlayer prompt = MediaPlayer.create(getActivity(), R.raw.prompt_asteroid);
-            prompt.start();
-        }
-        else if (String.valueOf(spinner1.getSelectedItem()).equals("Pizza")){
-            final MediaPlayer prompt = MediaPlayer.create(getActivity(), R.raw.prompt_pizza);
-            prompt.start();
-        }
-
+         try {
+             Response response = client.newCall(request).execute();
+             FileOutputStream fos = new FileOutputStream(Environment.getExternalStorageDirectory().getAbsolutePath()+ "/audioprompt.mp4");
+             fos.write(response.body().bytes());
+             fos.close();
+              MediaPlayer mp = new MediaPlayer();
+             mp.setDataSource(Environment.getExternalStorageDirectory().getAbsolutePath()+ "/audioprompt.mp4");
+             mp.prepare();
+             mp.start();
+         } catch (IOException e) {
+             e.printStackTrace();
+         }
         try {
-            Thread.sleep(5000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }
+                                                                                                                                          }
 
-        //REWARD
-        // rewardDog();
+                                                                                                                                         MediaPlayer mpPrompt = new MediaPlayer();
+                                                                                                                                         try {
+                                                                                                                                             mpPrompt.setDataSource(Environment.getExternalStorageDirectory().getAbsolutePath()+ "/audioprompt.mp4");
+                                                                                                                                             mpPrompt.prepare();
+                                                                                                                                             mpPrompt.start();
+                                                                                                                                         } catch (IOException e) {
+                                                                                                                                             e.printStackTrace();
+                                                                                                                                         }
 
+    }
+
+    public void getResponseFromSpeechAce(View v, TextView httpResponseText) {
+        playPrompt();
         Log.d("RECORD", "GOING TO START RECORDING");
 
         //record
@@ -193,13 +205,11 @@ public class SpeechAce extends Fragment {
 
         //stop + save
         stopRecording();
-       // Log.d("RECORD", "RECORDING FINISHED");
 
         // String path = "/storage/emulated/0/Download/api-samples/api-samples/";
         String path = Environment.getExternalStorageDirectory().getAbsolutePath()+ "/";
-        //Log.d("PATH", path);
-        //File file = new File (path, "apple.wav");
         File file = new File(path, "audiorecorded.mp4");
+
 
         // Send Request with the audio file to SpeechAce
         String responseText = sendRequestToSpeechAce(file);
@@ -218,9 +228,8 @@ public class SpeechAce extends Fragment {
                 cumulativeQualityScore += singleQualityScore;
             }
             cumulativeQualityScore = cumulativeQualityScore/cumulativeQScoreList.size();
-            //System.out.println("Quality Score: " + cumulativeQualityScore + "/100");
-            String outputText = "Total Score: " +  cumulativeQualityScore + "/100";
-            //System.out.println(outputText);
+            int scoreToPrint = (cumulativeQualityScore).intValue();
+            String outputText = "Total Score: " +  scoreToPrint + "/100";
             httpResponseText.setText(outputText);
 
             if (cumulativeQualityScore > 30){
@@ -228,7 +237,7 @@ public class SpeechAce extends Fragment {
                 rewardDog();
             }
             else {
-                outputText = "Total Score: "+ cumulativeQualityScore + "/100. Please prompt the child again.";
+                outputText = "Total Score: "+ scoreToPrint + "/100. Please prompt the child again.";
                 httpResponseText.setText(outputText);
             }
         }
@@ -255,7 +264,6 @@ public class SpeechAce extends Fragment {
             return response.body().string();
         }
         catch (IOException e) {
-
             return "Error";
         }
     }
@@ -300,10 +308,15 @@ public class SpeechAce extends Fragment {
 
 
     private void beginRecording() throws IOException {
+
+        //set audio source to bluetooth
+        audioManager.setMode(AudioManager.MODE_IN_CALL);
+        audioManager.startBluetoothSco();
+        audioManager.setBluetoothScoOn(true);
+
+        //start recording
         ditchMediaRecorder();
-
         String path = Environment.getExternalStorageDirectory().getAbsolutePath()+ "/audiorecorded.mp4";
-
         recorder = new MediaRecorder();
         recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
@@ -330,6 +343,10 @@ public class SpeechAce extends Fragment {
             //Toast.makeText(getApplicationContext(), "stopping",Toast.LENGTH_LONG).show();
         }
 
+         //stop audio from mic
+        audioManager.setMode(AudioManager.MODE_NORMAL);
+        audioManager.stopBluetoothSco();
+        audioManager.setBluetoothScoOn(false);
 
     }
 
