@@ -1,6 +1,42 @@
 <resources>
     <string name="app_name">Vobot</string>
 
-<!-- TODO: Remove or change this placeholder text -->
+
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="response_prompt">Choose a word</string>
+    <string name="play">Play</string>
+    <string name="record">Record</string>
+    <string name="btnToRecord">Record</string>
+
+    <string-array name="response_arrays">
+        <item>Play a sound</item>
+        <item>Dance</item>
+    </string-array>
+
+    <string-array name="spinner_word_choice">
+        <item>Apple</item>
+        <item>Mother</item>
+        <item>Table</item>
+        <item>Computer</item>
+        <item>Asteroid</item>
+        <item>Pizza</item>
+
+    </string-array>
+
+    <string name="title_activity_record_words">Record_words</string>
+    <string name="Testing">testing</string>
+    <string name="help">help</string>
+    <string name="miles">Miles</string>
+    <string name="syllable1">syllable1</string>
+    <string name="score1">score1</string>
+    <string name="syllable2">syllable2</string>
+    <string name="score2">score2</string>
+    <string name="syllable3">syllable3</string>
+    <string name="score3">score3</string>
+
 </resources>

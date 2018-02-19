@@ -40,7 +40,7 @@ public class MenuFragment extends ChipBaseFragment {
         View view = inflater.inflate(R.layout.fragment_menu, container, false);
 
         ListView listView = (ListView) view.findViewById(R.id.menuTable);
-        String[] robotNameArr = {"Interation", "Setting", "SpeechAce"};
+        String[] robotNameArr = {"Interation", "Setting", "Learning Session"};
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_list_item_1, android.R.id.text1, robotNameArr);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
