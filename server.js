@@ -22,20 +22,6 @@ con.connect(function(err) {
     console.log("Conected!");
 });
 
-// con.query("CREATE TABLE IF NOT EXISTS accounts (phone_number VARCHAR(10)" function(err, result) {
-//     if (err) throw err;
-//     console.log("Accounts Table Created");
-// });
-
-// con.query("CREATE TABLE IF NOT EXISTS sessions (phone_number VARCHAR(10)" function(err, result) {
-//     if (err) throw err;
-//     console.log("Accounts Table Created");
-// });
-
-// con.query("CREATE TABLE IF NOT EXISTS progress (phone_number VARCHAR(10)" function(err, result) {
-//     if (err) throw err;
-//     console.log("Accounts Table Created");
-// });
 
 // Calculates level, overall score, session 
 app.post('/calc_val', function(req,res) {
@@ -55,7 +41,7 @@ app.post('/calc_val', function(req,res) {
 
     indiv_score = parseInt(indiv_score);
 
-    con.query('SELECT level, overall_score, overall_sessions, counter FROM progress WHERE phone_number=? AND childs_word=?', [phone_number, childs_word], function(err,results, fields) {
+    con.query('SELECT level, overall_score, overall_sessions FROM progress WHERE phone_number=? AND childs_word=?', [phone_number, childs_word], function(err,results, fields) {
         if (err) {
             console.log(err)
         }
@@ -64,178 +50,184 @@ app.post('/calc_val', function(req,res) {
                 if (results) {
                     level = results[0].level;
                     score = results[0].overall_score;
-        		    session = results[0].overall_sessions;
+                   // console.log("SCORE1: " + score);
+		   // console.log("IndivScore " + indiv_score);
+		    session = results[0].overall_sessions;
                     session = session + 1;
-        		    counter = results[0].counter;
+//		    counter = results[0].counter;
+                   // console.log("SCORE: " + score);
                     score = (score + indiv_score) / 2;
-        		    if (counter >= 3) {
-                        switch(level) {
-                            case 2: // 10 - 20
+	//		console.log("SCORE: " + score);
+//		   if (counter >= 3) {
+		   // return res.send({"sessions: ": session, "score: " : score});
+                    switch(level) {
+                        case 2: // 10 - 20
+                        // goes down
+                            if (indiv_score < 10) {
+                                level = 1;
+                            }
+                            // goes up
+                            else if (indiv_score >= 20) {
+                                level = 3;
+                                levelbool = true;
+                            }
+                            // same
+                            else {
+                                level = 2;
+                            }
+                            break;
+        
+                        case 3: // 20-30
                             // goes down
-                                if (indiv_score < 10) {
-                                    level = 1;
-                                }
-                                // goes up
-                                else if (indiv_score >= 20) {
-                                    level = 3;
-                                    levelbool = true;
-                                }
-                                // same
-                                else {
-                                    level = 2;
-                                }
-                                break;
-            
-                            case 3: // 20-30
-                                // goes down
-                                if (indiv_score < 20) {
-                                    level = 2;
-                                }
-                                // goes up
-                                else if (indiv_score >= 30) {
-                                    level = 4;
-                                    levelbool = true;
-                                }
-                                // same
-                                else {
-                                    level = 3;
-                                }
-                                break;
-            
-                            case 4: // 30-40
-                                // down
-                                if (indiv_score < 30) {
-                                    level = 3;
-                                }
-                                // up
-                                else if (indiv_score >= 40) {
-                                    level = 5;
-                                    levelbool = true;
-                                }
-                                // same
-                                else {
-                                    level = 4;
-                                }
-                                break;
-            
-                            case 5: // 40-50
-                                // down
-                                if (indiv_score < 40) {
-                                    level = 4;
-                                }
-                                // up
-                                else if (indiv_score >= 50) {
-                                    level = 6;
-                                    levelbool = true;
-                                }
-                                // same
-                                else {
-                                    level = 5;
-                                }
-                                break;
-            
-                            case 6: // 50-60
-                                // down
-                                if (indiv_score < 50) {
-                                    level = 5;
-                                }
-                                // up
-                                else if (indiv_score >= 60) {
-                                    level = 7;
-                                    levelbool = true;
-                                }
-                                // same
-                                else {
-                                    level = 6;
-                                }
-                                break;
-            
-                            case 7: // 60-70
-                                // down
-                                if (indiv_score < 60) {
-                                    level = 6;
-                                }
-                                // up
-                                else if (indiv_score >= 70) {
-                                    level = 8;
-                                    levelbool = true;
-                                }
-                                // same
-                                else {
-                                    level = 7;
-                                }
-                                break;
-            
-                            case 8: //70-80
-                                // goes down
-                                if (indiv_score < 70) {
-                                    level = 7;
-                                }
-                                // goes up
-                                else if (indiv_score >= 80) {
-                                    level = 9;
-                                    levelbool = true;
-                                }
-                                // stays 
-                                else {
-                                    level = 8;
-                                }
-                                break;
-            
-                            case 9: //80-90
-                                // goes down
-                                if (indiv_score < 80) {
-                                    level = 8;
-                                }
-                                // goes up
-                                else if (indiv_score >= 90) {
-                                    level = 10;
-                                    levelbool = true;
-                                }
-                                // stays
-                                else {
-                                    level = 9;
-                                }
-                                break;
-            
-                            case 10: //90-100
-                                // goes down
-                                if (indiv_score < 90) {
-                                    level = 9;
-                                }
-                                // stays
-                                else {
-                                    level = 10;
-                                }
-                                break;
-            
-                            default:
-                                level = level;
-                                break;
-                        }
-    		        counter = 0;
-    		    }
-    		    else {
-    			    counter = counter + 1;
-    		    }
+                            if (indiv_score < 20) {
+                                level = 2;
+                            }
+                            // goes up
+                            else if (indiv_score >= 30) {
+                                level = 4;
+                                levelbool = true;
+                            }
+                            // same
+                            else {
+                                level = 3;
+                            }
+                            break;
+        
+                        case 4: // 30-40
+                            // down
+                            if (indiv_score < 30) {
+                                level = 3;
+                            }
+                            // up
+                            else if (indiv_score >= 40) {
+                                level = 5;
+                                levelbool = true;
+                            }
+                            // same
+                            else {
+                                level = 4;
+                            }
+                            break;
+        
+                        case 5: // 40-50
+                            // down
+                            if (indiv_score < 40) {
+                                level = 4;
+                            }
+                            // up
+                            else if (indiv_score >= 50) {
+                                level = 6;
+                                levelbool = true;
+                            }
+                            // same
+                            else {
+                                level = 5;
+                            }
+                            break;
+        
+                        case 6: // 50-60
+                            // down
+                            if (indiv_score < 50) {
+                                level = 5;
+                            }
+                            // up
+                            else if (indiv_score >= 60) {
+                                level = 7;
+                                levelbool = true;
+                            }
+                            // same
+                            else {
+                                level = 6;
+                            }
+                            break;
+        
+                        case 7: // 60-70
+                            // down
+                            if (indiv_score < 60) {
+                                level = 6;
+                            }
+                            // up
+                            else if (indiv_score >= 70) {
+                                level = 8;
+                                levelbool = true;
+                            }
+                            // same
+                            else {
+                                level = 7;
+                            }
+                            break;
+        
+                        case 8: //70-80
+                            // goes down
+                            if (indiv_score < 70) {
+                                level = 7;
+                            }
+                            // goes up
+                            else if (indiv_score >= 80) {
+                                level = 9;
+                                levelbool = true;
+                            }
+                            // stays 
+                            else {
+                                level = 8;
+                            }
+                            break;
+        
+                        case 9: //80-90
+                            // goes down
+                            if (indiv_score < 80) {
+                                level = 8;
+                            }
+                            // goes up
+                            else if (indiv_score >= 90) {
+                                level = 10;
+                                levelbool = true;
+                            }
+                            // stays
+                            else {
+                                level = 9;
+                            }
+                            break;
+        
+                        case 10: //90-100
+                            // goes down
+                            if (indiv_score < 90) {
+                                level = 9;
+                            }
+                            // stays
+                            else {
+                                level = 10;
+                            }
+                            break;
+        
+                        default:
+                            level = level;
+                            break;
+                    }
+//		    counter = 0;
+//		    }
+//		    else {
+//			counter = counter + 1;
+//		    }
                     return res.send({error:false, levelbool: levelbool, level: level, session: session, overall_score: score, counter: counter})
+                }
             }
-        }
             else {
                 level = 1;
                 score = indiv_score;
                 session = 1;
-                counter = 0;
-                // // goes up
-                // if (indiv_score >= 10) {
-                //     level = 2;
-                //     levelbool = true;
-                // }
-                // // same
-                // else {
-                //     level = 1;
-                // }
+		//counter = 0;
+                // goes up
+                if (indiv_score >= 10) {
+                    level = 2;
+                    levelbool = true;
+                }
+                // same
+                else {
+                    level = 1;
+                }
                 return res.send({error:false, levelbool: levelbool, level: level, session: session, overall_score: score, counter: counter})
+
             }
         }
 
@@ -271,8 +263,9 @@ app.post('/progress', function(req, res) {
     let overall_sessions = req.body.overall_sessions;   
     
     overall_score = Math.round(overall_score);    
-    var sql = 'INSERT INTO progress (phone_number, childs_word, childs_name, overall_score, level, overall_sessions, counter) VALUES ? ON DUPLICATE KEY UPDATE overall_score=VALUES(overall_score), level=VALUES(level), overall_sessions=VALUES(overall_sessions), counter=VALUES(counter)';
-    var data = [[phone_number, childs_word, childs_name, overall_score, level, overall_sessions, counter]];
+  //  var data = {phone_number: phone_number, childs_word: childs_word, childs_name: childs_name, overall_score: overall_score, level: level, overall_sessions: overall_sessions};
+    var sql = 'INSERT INTO progress (phone_number, childs_word, childs_name, overall_score, level, overall_sessions) VALUES ? ON DUPLICATE KEY UPDATE overall_score=VALUES(overall_score), level=VALUES(level), overall_sessions=VALUES(overall_sessions)';
+    var data = [[phone_number, childs_word, childs_name, overall_score, level, overall_sessions]];
     con.query(sql, [data], function(error, results) {
         if (error) throw error;
         return res.send({ error: false, data: results, message: 'Progress table updated.' });
