@@ -10,11 +10,11 @@ app.use(bodyParser.urlencoded({
  
 // connection configurations
 const con = mysql.createConnection({
-    host: 'vobot.cbd0j537sw1a.us-east-1.rds.amazonaws.com',
+    host: "INSERT HOST NAME HERE",
     port: '3306',
-    user: 'scbhatia',
-    password: '12345678',
-    database: 'vobot'
+    user: "INSERT USERNAME HERE",
+    password: "INSERT PASSWORD HERE",
+    database: "INSERT DATABASE NAME HERE"
 });
 
 con.connect(function(err) {
@@ -22,6 +22,23 @@ con.connect(function(err) {
     console.log("Conected!");
 });
 
+var sql = "CREATE TABLE IF NOT EXISTS accounts (phone_number VARCHAR(10) PRIMARY KEY NOT NULL)";
+con.query(sql, function(err, result) {
+    if (err) throw err;
+    console.log("Accounts table created");
+});
+
+var sql1 = "CREATE TABLE IF NOT EXISTS sessions(phone_number VARCHAR(10) PRIMARY KEY NOT NULL, session INT(11) PRIMARY KEY NOT NULL, childs_word VARCHAR(255) PRIMARY KEY NOT NULL, childs_name VARCHAR(255) NOT NULL, indiv_score DOUBLE NOT NULL, level INT(11) NOT NULL)";
+con.query(sql1, function(err, result) {
+    if (err) throw err;
+    console.log("Sessions table created");
+});
+
+var sql2 = "CREATE TABLE IF NOT EXISTS progress(phone_number VARCHAR(10) PRIMARY KEY NOT NULL, childs_word VARCHAR(255) PRIMARY KEY NOT NULL, childs_name VARCHAR(255) NOT NULL, overall_score DOUBLE NOT NULL, level INT(11) NOT NULL, overall_sessions INT(11) NOT NULL)";
+con.query(sql2, function(err, results) {
+    if (err) throw err;
+    console.log("Progress table created");
+});
 
 // Calculates level, overall score, session 
 app.post('/calc_val', function(req,res) {
