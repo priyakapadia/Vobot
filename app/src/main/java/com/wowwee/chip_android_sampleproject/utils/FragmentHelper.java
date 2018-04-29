@@ -9,9 +9,9 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
-//import android.app.Fragment;
-//import android.app.FragmentManager;
-//import android.app.FragmentTransaction;
+/**
+ * The FragmentHelper class manages all navigation between the fragments.
+*/
 
 public class FragmentHelper {
 	public static List<WeakReference<Fragment>> fragments = new ArrayList<WeakReference<Fragment>>();
@@ -21,25 +21,6 @@ public class FragmentHelper {
 	
 	public static void switchFragment(FragmentManager fragmentManager, Fragment fragment, int containViewId, boolean addToBackStack)
 	{
-//		fragments.add(new WeakReference<Fragment>(fragment));
-//		
-//		FragmentTransaction transaction = fragmentManager.beginTransaction();
-//		transaction.replace(containViewId, fragment);
-////		transaction.replace(containViewId, fragment, fragment.getClass().toString());
-//		if (addToBackStack)
-//		{
-//			backStackIndex++;
-//			String key = "" + backStackIndex;
-//			transaction.addToBackStack(key);
-//			backStackKeys.add(key);
-//		}
-//		else
-//		{
-////			transaction.addToBackStack(null);
-//		}
-//		
-//		transaction.commit();
-		
 		boolean isContain = false;
 		for (int i = 0; i < fragments.size(); i++){
 			if (fragments.get(i).get() != null && fragments.get(i).get().getClass() == fragment.getClass()){
@@ -64,14 +45,20 @@ public class FragmentHelper {
 			backStackKeys.add(key);
 			
 		}
-		else
-		{
-//			transaction.addToBackStack(null);
-		}
 		transaction.replace(containViewId, fragment, ""+backStackIndex);
 		transaction.commitAllowingStateLoss();
 	}
+
+	/*
 	
+	public static void reloadFragment(FragmentManager fragmentManager, Fragment fragment) {
+		if (fragment != null){
+			FragmentTransaction ft = fragmentManager.beginTransaction();
+			ft.detach(fragment);
+			ft.attach(fragment);
+			ft.commitAllowingStateLoss();
+		}
+	}
 	public static void hideAndShowFragment(FragmentManager fragmentManager, Fragment[] hideFragment, Fragment[] showFragment){
 		FragmentTransaction transaction = fragmentManager.beginTransaction();
 		for (Fragment fragment : showFragment){
@@ -80,32 +67,21 @@ public class FragmentHelper {
 		for (Fragment fragment : hideFragment){
 			transaction.hide(fragment);
 		}
-		
+
 		transaction.commitAllowingStateLoss();
 	}
-	
+
 	public static void reloadFragment(FragmentManager fragmentManager, Fragment fragment, int containViewId) {
 		if (fragment != null){
 			FragmentTransaction ft = fragmentManager.beginTransaction();
 			ft.setTransition(-1);
-	//		ft.replace(containViewId, fragment);
+			//		ft.replace(containViewId, fragment);
 			ft.detach(fragment);
 			ft.attach(fragment);
 			ft.commitAllowingStateLoss();
 		}
 	}
-	
-	public static void reloadFragment(FragmentManager fragmentManager, Fragment fragment) {
-		if (fragment != null){
-			FragmentTransaction ft = fragmentManager.beginTransaction();
-//			ft.setTransition(-1);
-	//		ft.replace(containViewId, fragment);
-			ft.detach(fragment);
-			ft.attach(fragment);
-			ft.commitAllowingStateLoss();
-		}
-	}
-	
+
 	public static boolean popBackStack(FragmentManager fragmentManager)
 	{
 		if(backStackKeys.size() > 0)
@@ -180,4 +156,6 @@ public class FragmentHelper {
 			reloadFragment(fragmentManager, fragments.get(i).get());
 		}
 	}
+
+	*/
 }

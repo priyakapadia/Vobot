@@ -4,40 +4,71 @@
     android:layout_height="match_parent">
 
 
-        <ImageView
-            android:id="@+id/phone_icon"
-            android:layout_centerHorizontal="true"
-            android:layout_width="200dp"
-            android:layout_height="150dp"
-            android:layout_gravity="center"
-            android:src="@drawable/logo"/>
+    <ImageView
+        android:id="@+id/phone_icon"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_gravity="center"
+        android:src="@drawable/logo" />
 
     <TextView
         android:id="@+id/topTV"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Connect to CHIP"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="150dp"
+        android:text="CONNECT TO CHIP"
         android:textAlignment="center"
-        android:textSize="30dp"
-        android:layout_marginTop="120dp"
-        android:layout_alignParentTop="true"/>
+        android:textSize="30dp" />
 
     <Button
         android:id="@+id/refreshBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Refresh"
+        android:layout_alignParentTop="true"
         android:layout_centerInParent="true"
         android:layout_gravity="center"
-        android:layout_marginTop="160dp"
-        android:layout_alignParentTop="true"/>
+        android:layout_marginTop="200dp"
+        android:fontFamily="sans-serif"
+        android:text="Refresh" />
 
+
+
+
+
+    <!--<EditText-->
+    <!--android:id="@+id/phone_number"-->
+    <!--android:layout_width="fill_parent"-->
+        <!--android:focusableInTouchMode="true"-->
+        <!--android:focusable="true"-->
+
+    <!--android:layout_height="wrap_content"-->
+    <!--android:hint="Type in your phone number"-->
+    <!--android:inputType="phone"-->
+    <!--android:layout_below="@id/refreshBtn"-->
+    <!--android:imeOptions="actionDone"-->
+  <!--/>-->
+
+    <!--<Button-->
+    <!--android:id="@+id/post_number"-->
+    <!--android:text="Post"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_marginBottom="0sp"-->
+    <!--android:layout_marginTop="20sp"-->
+    <!--android:textSize="20sp"-->
+    <!--android:layout_below="@id/phone_number"-->
+    <!--/>-->
 
 
     <ListView
         android:id="@+id/connectionTable"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/refreshBtn"></ListView>
+        android:layout_below="@id/refreshBtn"
+        />
 
 </RelativeLayout>
+

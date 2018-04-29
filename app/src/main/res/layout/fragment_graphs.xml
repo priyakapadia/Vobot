@@ -1,0 +1,65 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.wowwee.chip_android_sampleproject.fragment.LearningSession">
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_marginTop="50dp"
+    android:layout_height="match_parent">
+
+
+    <TextView
+        android:id="@+id/topTV2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:gravity="center_horizontal"
+        android:text="PROGRESS"
+        android:textAlignment="center"
+        android:textSize="30sp" />
+
+    <Button
+        android:id="@+id/backButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:layout_marginLeft="100dp"
+        android:layout_marginRight="100dp"
+        android:enabled="true"
+        android:fontFamily="sans-serif"
+        android:text="Back"
+        android:textAlignment="center" />
+
+
+
+    <Spinner
+        android:id="@+id/spinner_graph_word_choice"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginLeft="70dp"
+        android:layout_marginRight="70dp"
+        android:layout_marginTop="20dp"
+        android:dropDownHeight="100dp"
+        android:textAlignment="center"
+        android:entries="@array/spinner_word_choice"
+        android:gravity="top|bottom|left|center_vertical"
+        android:prompt="@string/response_prompt"
+        android:textSize="20sp"
+        android:theme="?attr/actionBarPopupTheme" />
+
+
+    <com.jjoe64.graphview.GraphView
+        android:id="@+id/graph"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="20dp"
+        android:scrollbars="horizontal|vertical" />
+</LinearLayout>
+
+</ScrollView>

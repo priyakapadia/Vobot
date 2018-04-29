@@ -1,6 +1,7 @@
 package com.wowwee.chip_android_sampleproject.fragment;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
@@ -8,19 +9,22 @@ import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.wowwee.bluetoothrobotcontrollib.chip.ChipCommandValues;
 import com.wowwee.bluetoothrobotcontrollib.chip.ChipRobot;
 import com.wowwee.bluetoothrobotcontrollib.chip.ChipRobotFinder;
+import com.wowwee.chip_android_sampleproject.MainActivity;
 import com.wowwee.chip_android_sampleproject.R;
 import com.wowwee.chip_android_sampleproject.utils.FragmentHelper;
 
 /**
- * Created by davidchan on 22/3/2017.
+ * ModuleSettingFragment controls the settings page where the user can control CHiP's settings and check its battery life.
  */
 
 public class ModuleSettingFragment extends ChipBaseFragment {
@@ -47,8 +51,8 @@ public class ModuleSettingFragment extends ChipBaseFragment {
 
         handler = new Handler();
 
-        ListView listView = (ListView)view.findViewById(R.id.menuTable);
-        String[] ledNameArr = {"Back", "Read Firmware", "Detect Battery", "Get Volume", "Set Volume", "Get Eye Brightness", "Set Eye Brightness", "Get Adult or Kid Speed", "Set Adult or Kid Speed", "Force Sleep"};
+        final ListView listView = (ListView)view.findViewById(R.id.menuTable);
+        String[] ledNameArr = {"Back", "Detect Battery", "Get Volume", "Set Volume", "Get Eye Brightness", "Set Eye Brightness", "Force Sleep", "Send CHiP to Charge"};
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_list_item_1, android.R.id.text1, ledNameArr);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -61,33 +65,28 @@ public class ModuleSettingFragment extends ChipBaseFragment {
                             FragmentHelper.switchFragment(getActivity().getSupportFragmentManager(), new MenuFragment(), R.id.view_id_content, false);
                             break;
                         case 1:
-                            robot.readChipFirmwareVersion();
-                            break;
-                        case 2:
                             robot.chipGetBatteryLevel();
                             break;
-                        case 3:
+                        case 2:
                             robot.chipGetVolume();
                             break;
-                        case 4:
+                        case 3:
                             setVolume();
                             break;
-                        case 5:
+                        case 4:
                             robot.chipGetEyeRGBBrightness();
                             break;
-                        case 6:
+                        case 5:
                             setEyeRGBBrightness();
                             break;
-                        case 7:
-                            robot.chipGetAdultOrKidSpeed();
-                            break;
-                        case 8:
-                            setAdultOrKidSpeed();
-                            break;
-                        case 9:
+                        case 6:
+                            Toast.makeText(getActivity(), "Turn off and on CHIP to stop sleeping", Toast.LENGTH_LONG)
+                                    .show();
                             robot.chipForceSleep();
                             break;
-
+                        case 7:
+                            robot.chipPlayBodycon((byte)(16));
+                            break;
                     }
                 }
             }
@@ -97,7 +96,8 @@ public class ModuleSettingFragment extends ChipBaseFragment {
     }
 
     void setVolume() {
-        AlertDialog.Builder  builder = new AlertDialog.Builder(getActivity());
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Set Volume (0-11)");
         final EditText input = new EditText(getActivity());
         input.setInputType(InputType.TYPE_CLASS_NUMBER);
@@ -107,13 +107,24 @@ public class ModuleSettingFragment extends ChipBaseFragment {
             public void onClick(DialogInterface dialog, int which) {
                 ChipRobot robot = ChipRobotFinder.getInstance().getChipRobotConnectedList().get(0);
                 int value = Integer.valueOf(input.getText().toString());
-                robot.chipSetVolumeLevel(value);
+                if (value < 0 || value > 11) {
+                    Toast.makeText(getActivity(), "Invalid Volume!", Toast.LENGTH_LONG)
+                            .show();
+                } else {
+                    robot.chipSetVolumeLevel(value);
+                }
+                InputMethodManager mgr = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                mgr.hideSoftInputFromWindow(input.getWindowToken(), 0);
+
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                InputMethodManager mgr = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                mgr.hideSoftInputFromWindow(input.getWindowToken(), 0);
                 dialog.cancel();
+
             }
         });
         builder.show();
@@ -129,11 +140,25 @@ public class ModuleSettingFragment extends ChipBaseFragment {
             public void onClick(DialogInterface dialog, int id) {
                 ChipRobot robot = ChipRobotFinder.getInstance().getChipRobotConnectedList().get(0);
                 int value = Integer.valueOf(input1.getText().toString());
-                robot.chipSetEyeRGBBrightness((byte)value);
+                if (value < 0 || value > 255){
+                    Toast.makeText(getActivity(), "Invalid Eye Brightness!", Toast.LENGTH_LONG)
+                            .show();
+                }
+                else {
+                    robot.chipSetEyeRGBBrightness((byte) value);
+                }
+                InputMethodManager mgr = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                mgr.hideSoftInputFromWindow(input1.getWindowToken(), 0);
+
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                InputMethodManager mgr = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                mgr.hideSoftInputFromWindow(input1.getWindowToken(), 0);
+                dialog.cancel();
+
             }
         });
         builder.show();
@@ -153,10 +178,18 @@ public class ModuleSettingFragment extends ChipBaseFragment {
                     robot.chipSetAdultOrKidSpeed(ChipCommandValues.kChipSpeed.kChipAdultSpeed);
                 else
                     robot.chipSetAdultOrKidSpeed(ChipCommandValues.kChipSpeed.kChipKidSpeed);
+                InputMethodManager mgr = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                mgr.hideSoftInputFromWindow(input.getWindowToken(), 0);
+
             }
         })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        InputMethodManager mgr = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                        mgr.hideSoftInputFromWindow(input.getWindowToken(), 0);
+                        dialog.cancel();
+
                     }
                 });
         builder.show();
@@ -205,7 +238,7 @@ public class ModuleSettingFragment extends ChipBaseFragment {
             public void run() {
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 builder.setTitle("Battery Level");
-                builder.setMessage(batteryLevel + "");
+                builder.setMessage((batteryLevel*100) + "%");
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

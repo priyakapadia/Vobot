@@ -19,8 +19,9 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme" >
-        <activity android:name="com.wowwee.chip_android_sampleproject.MainActivity" >
+        android:theme="@style/AppTheme"  >
+        <activity android:name="com.wowwee.chip_android_sampleproject.MainActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -13,10 +13,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.wowwee.bluetoothrobotcontrollib.chip.ChipRobot;
 import com.wowwee.bluetoothrobotcontrollib.chip.ChipRobotFinder;
@@ -26,8 +30,10 @@ import com.wowwee.chip_android_sampleproject.utils.FragmentHelper;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.content.Context.MODE_PRIVATE;
+
 /**
- * Created by davidchan on 22/3/2017.
+ ConnectFragment maintains connectivity with WowWee CHiP across all pages
  */
 
 public class ConnectFragment extends ChipBaseFragment {
@@ -43,6 +49,7 @@ public class ConnectFragment extends ChipBaseFragment {
         if (container == null)
             return null;
 
+
         final int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                 | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                 | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
@@ -51,9 +58,15 @@ public class ConnectFragment extends ChipBaseFragment {
                 | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
 
         getActivity().getWindow().getDecorView().setSystemUiVisibility(flags);
-
-
         View view = inflater.inflate(R.layout.fragment_connect, container, false);
+       // moveTaskToBack(true);
+        getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN); //hides keyboard on start
+
+//        this.getActivity().getSharedPreferences("PREFERENCE", MODE_PRIVATE).edit()
+//                .putBoolean("isFirstRun", true).apply(); //uncomment if you want to set to first time use, and comment out the next two lines
+
+        this.getActivity().getSharedPreferences("PREFERENCE", MODE_PRIVATE).edit()
+                        .putBoolean("isFirstRun", false).apply(); //if you are on connect page, this is not your first run
 
         listView = (ListView)view.findViewById(R.id.connectionTable);
         String[] robotNameArr = {"Please turn on CHIP"};
@@ -87,6 +100,7 @@ public class ConnectFragment extends ChipBaseFragment {
                                     connect(connectChipRobot);
                                     // Stop scan Chip
                                     scanLeDevice(false);
+
                                 }
                             });
                             break;
@@ -102,6 +116,13 @@ public class ConnectFragment extends ChipBaseFragment {
     void connect(ChipRobot robot) {
         robot.setCallbackInterface(this);
         robot.connect(getActivity());
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        Toast.makeText(getActivity(),"Connected to CHiP!",Toast.LENGTH_SHORT).show();
+
     }
 
     @Override

@@ -19,7 +19,7 @@ import com.wowwee.chip_android_sampleproject.R;
 import com.wowwee.chip_android_sampleproject.utils.FragmentHelper;
 
 /**
- * Created by davidchan on 22/3/2017.
+ AnimationFragment controls all of WowWee CHiP's animations
  */
 
 public class AnimationFragment extends ChipBaseFragment {
@@ -49,7 +49,7 @@ public class AnimationFragment extends ChipBaseFragment {
             robot.setCallbackInterface(AnimationFragment.this);
         }
         listView = (ListView)view.findViewById(R.id.menuTable);
-        String[] listArr = {"Back", "kChipBodyconReset", "kChipBodyconSit", "kChipBodyconLieDown", "kChipBodyconAllIdleMode", "kChipBodyconDance", "kChipBodyconVRTraining1", "kChipBodyconVRTraining2", "kChipBodyconReset2", "kChipBodyconJump", "kChipBodyconYoga", "kChipBodyconWatchCome", "kChipBodyconWatchFollow", "kChipBodyconWatchFetch", "kChipBodyconBallTracking", "kChipBodyconBallSoccer", "kChipBodyconBase", "kChipBodyconDanceBase", "kChipBodyconStopOrStandFromBase", "kChipBodyconGuardMode", "kChipBodyconFreeRoam", "kChipBodyconFaceDownForControllingChippies"};
+        String[] listArr = {"Back", "Reset", "Sit", "Lie Down", "Idle", "Dance", "VR Training 1", "VR Training 2", "Reset 2", "Jump", "Yoga", "Come to watch holder", "Follow to watch holder", "Fetch ball", "Track the ball", "Play soccer with the ball", "Return to Base", "Dance to Base", "Stop or stand from Base", "Guard Mode", "Free Roam", "Face down for controlling Chippies"};
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_list_item_1, android.R.id.text1, listArr);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
